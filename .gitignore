@@ -2,3 +2,8 @@
 starter_kit/target/
 starter_kit/output/
 starter_kit/output.h5ad
+
+.nextflow*
+work/
+.DS_Store
+*.pyc
