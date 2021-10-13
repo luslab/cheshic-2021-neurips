@@ -8,3 +8,5 @@ work/
 .DS_Store
 *.pyc
 starter_kit/submission.zip
+
+examples/chris_conv_atac_to_ct/preprocessed.h5ad
