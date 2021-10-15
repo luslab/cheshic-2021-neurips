@@ -138,7 +138,7 @@ for epoch in range(epochs):
         if i % loss_print_freq == loss_print_freq - 1:
             single_loss = running_loss / loss_print_freq
             train_losses.append(single_loss)
-            logging.info('[epoch-%d, step-%5d] loss: %.3f' % (epoch + 1, i + 1, single_loss))
+            logging.info('[epoch-%d, %5d] loss: %.3f' % (epoch + 1, i + 1, single_loss))
             running_loss = 0.0
 
         # eval
@@ -164,7 +164,7 @@ for epoch in range(epochs):
             test_accuracy.append(single_test_accuracy)
             model.train()
 
-            logging.info('EVAL - [epoch-%d, step-%5d] test_loss: %.3f test_accuracy: %.3f' % (epoch + 1, i + 1, single_test_loss, single_test_accuracy * 100))
+            logging.info('EVAL - [epoch-%d, %5d] test_loss: %.3f test_accuracy: %.3f' % (epoch + 1, i + 1, single_test_loss, single_test_accuracy * 100))
 
 
 logging.info('Finished Training')
