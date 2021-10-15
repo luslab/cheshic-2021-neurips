@@ -21,14 +21,16 @@ logging.basicConfig(level=logging.INFO)
 ########### VARIABLES ##########
 
 example_count = 22463
+peak_count = 116490
 label_count = 21
 test_perc = 0.05
 
-batch_size = 64
+batch_size = 20
 learning_rate = 0.001
 momentum = 0.9
-epochs = 1
-loss_print_freq = 10
+epochs = 10
+loss_print_freq = 100
+eval_freq = 1000
 
 ########### CLASSES ##########
 
@@ -43,25 +45,20 @@ class ATACDataset(Dataset):
     def __getitem__(self, idx):
         label = self.dataset.obs.iloc[idx]['label_id']
         data = np.asarray(self.X[idx])
-        data = data[np.newaxis, :, :]
+        #data = data[np.newaxis, :, :]
+        data = np.squeeze(data)
         return data, label
 
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(1, 6, (1, 100))
-        #self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, (1, 100))
-        self.fc1 = nn.Linear(16 * 1 * 100, 120)
+        self.embed1 = nn.Linear(peak_count, 20)
+        self.fc1 = nn.Linear(20, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, label_count)
 
     def forward(self, x):
-        # Max pooling over a (2, 2) window
-        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
-        # If the size is a square, you can specify with a single number
-        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
-        x = torch.flatten(x, 1) # flatten all dimensions except the batch dimension
+        x = F.relu(self.embed1(x))
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
@@ -69,7 +66,18 @@ class Net(nn.Module):
 
 ########### MAIN ##########
 
-logging.info('Training...')
+# Log GPU status
+is_cuda = torch.cuda.is_available()
+logging.info("Cuda available: " + str(is_cuda))
+if is_cuda:
+    current_device = torch.cuda.current_device()
+    #torch.cuda.device(current_device)
+    device_count = torch.cuda.device_count()
+    logging.info("Cuda device count: " + device_count)
+    device_name = torch.cuda.get_device_name(current_device)
+    logging.info("Cuda device name: " + device_name)
+
+logging.info('Initialising')
 
 logging.info('Setup')
 
@@ -92,25 +100,26 @@ train_dataloader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 test_dataloader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 
 ## DEBUG ##
-# train_features, train_labels = next(iter(train_dataloader))
-# print(f"Feature batch shape: {train_features.size()}")
-# print(f"Labels batch shape: {train_labels.size()}")
+train_features, train_labels = next(iter(train_dataloader))
+print(f"Feature batch shape: {train_features.size()}")
+print(f"Labels batch shape: {train_labels.size()}")
 
 # Create model
 logging.info('Creating model')
-net = Net()
-print(net)
+model = Net()
+print(model)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
+optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 
 # Train model
 logging.info('Training model')
 
 for epoch in range(epochs):
-    logging.info('Epoch: ' + str(epoch))
-
     running_loss = 0.0
+    train_losses = []
+    test_losses = []
+    test_accuracy = []
     for i, data in enumerate(train_dataloader, 0):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
@@ -119,16 +128,43 @@ for epoch in range(epochs):
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = net(inputs)
+        outputs = model(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
         # print statistics
         running_loss += loss.item()
-        if i % loss_print_freq == 1999:    # print every n mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+        if i % loss_print_freq == loss_print_freq - 1:
+            single_loss = running_loss / loss_print_freq
+            train_losses.append(single_loss)
+            logging.info('[epoch-%d, step-%5d] loss: %.3f' % (epoch + 1, i + 1, single_loss))
             running_loss = 0.0
+
+        # eval
+        if i % eval_freq == eval_freq - 1:
+            model.eval()
+            test_loss = 0.0
+            accuracy = 0.0
+
+            with torch.no_grad():
+                for inputs, labels in test_dataloader:
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
+                    ps = torch.exp(outputs)
+                    top_p, top_class = ps.topk(1, dim=1)
+                    equals = top_class == labels.view(*top_class.shape)
+                    test_loss += loss.item()
+                    accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
+
+            test_count = len(test_dataloader)
+            single_test_loss = test_loss / test_count
+            single_test_accuracy = accuracy / test_count
+            test_losses.append(single_test_loss)
+            test_accuracy.append(single_test_accuracy)
+            model.train()
+
+            logging.info('EVAL - [epoch-%d, step-%5d] test_loss: %.3f test_accuracy: %.3f' % (epoch + 1, i + 1, single_test_loss, single_test_accuracy * 100))
+
 
 logging.info('Finished Training')
