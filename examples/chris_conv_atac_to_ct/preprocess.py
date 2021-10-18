@@ -32,6 +32,14 @@ df_ct_grouped['label_id'] = df_ct_grouped.index
 # Merge label ids with obs
 sc_raw_training.obs = sc_raw_training.obs.reset_index().merge(df_ct_grouped, on='cell_type', how='inner').set_index('index')
 
+# compute PCs
+sc.tl.pca(sc_raw_training, svd_solver='arpack')
+
+
+# top500 most variable genes 
+
+
+
 logging.info('Saving data...')
 
 sc_raw_training.write(filename='preprocessed.h5ad')
