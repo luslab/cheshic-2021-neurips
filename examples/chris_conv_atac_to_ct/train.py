@@ -34,20 +34,48 @@ eval_freq = 1000
 
 ########### CLASSES ##########
 
-class ATACDataset(Dataset):
-    def __init__(self, data_path):
+class RNA_funct( ):
+
+
+
+class ATAC_Dataset(Dataset):
+    
+    def __init__(self):
+        # main peak vs cell matrix to be fed to transformer
         self.dataset = sc.read(data_path)
         self.X = self.dataset.X.todense()
+
+        # extra features from ATAC to include in paralel
+        self.PCs = self.dataset.varm['PCs'] 
+        self.Genes = self.dataset. ##### TO DO 
+        self.QCs = self.dataset.obs[['nCount_peaks', 'atac_fragments', 'reads_in_peaks_frac', 'blacklist_fraction', 'nucleosome_signal']].to_numpy()
+
+
+        # get ground truth
+
+        # load scRNAseq
+        # XXXXXXXXX
+
+        # scRNAseq transform
+        # XXXXXXXXX
+
+        self.truth = self.dataset.obs.['label_id']
+
 
     def __len__(self):
         return len(self.dataset.obs.index)
 
+
     def __getitem__(self, idx):
-        label = self.dataset.obs.iloc[idx]['label_id']
-        data = np.asarray(self.X[idx])
-        #data = data[np.newaxis, :, :]
+        label = self.truth.iloc[idx]
+
+        data_transformer = np.asarray(self.X[idx])
+        data_extra = 
+
         data = np.squeeze(data)
         return data, label
+
+
 
 class Net(nn.Module):
     def __init__(self):
@@ -63,6 +91,16 @@ class Net(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
+
+
+
+
+
+
+
+
+
+
 
 ########### MAIN ##########
 
