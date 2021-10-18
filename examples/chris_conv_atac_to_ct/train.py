@@ -38,7 +38,8 @@ class RNA_funct( ):
 
 
 
-class ATAC_Dataset(Dataset):
+
+class Load_Dataset(Dataset):
     
     def __init__(self):
         # main peak vs cell matrix to be fed to transformer
@@ -56,7 +57,7 @@ class ATAC_Dataset(Dataset):
         # load scRNAseq
         # XXXXXXXXX
 
-        # scRNAseq transform
+        # RNA_funct output for another truth
         # XXXXXXXXX
 
         self.truth = self.dataset.obs.['label_id']
@@ -77,6 +78,7 @@ class ATAC_Dataset(Dataset):
 
 
 
+# transformer
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -95,7 +97,40 @@ class Net(nn.Module):
 
 
 
+# extra ATAC
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embed1 = nn.Linear(peak_count, 20)
+        self.fc1 = nn.Linear(20, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, label_count)
 
+    def forward(self, x):
+        x = F.relu(self.embed1(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+
+
+
+# Final
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embed1 = nn.Linear(peak_count, 20)
+        self.fc1 = nn.Linear(20, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, label_count)
+
+    def forward(self, x):
+        x = F.relu(self.embed1(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
 
 
