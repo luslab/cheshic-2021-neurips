@@ -10,3 +10,5 @@ work/
 starter_kit/submission.zip
 
 examples/chris_conv_atac_to_ct/preprocessed.h5ad
+
+data/
