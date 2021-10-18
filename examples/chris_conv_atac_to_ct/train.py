@@ -34,7 +34,7 @@ eval_freq = 1000
 
 ########### CLASSES ##########
 
-class RNA_funct( ):
+class RNA_fun( ):
 
 
 
@@ -60,7 +60,7 @@ class Load_Dataset(Dataset):
         # RNA_funct output for another truth
         # XXXXXXXXX
 
-        self.truth = self.dataset.obs.['label_id']
+        self.Y = self.dataset.obs.['label_id']
 
 
     def __len__(self):
