@@ -30,7 +30,7 @@ learning_rate = 0.001
 momentum = 0.9
 epochs = 10
 loss_print_freq = 100
-eval_freq = 1000
+eval_freq = 500
 
 ########### CLASSES ##########
 
@@ -52,10 +52,10 @@ class ATACDataset(Dataset):
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.embed1 = nn.Linear(peak_count, 20)
-        self.fc1 = nn.Linear(20, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, label_count)
+        self.embed1 = nn.Linear(peak_count, 100)
+        self.fc1 = nn.Linear(100, 200)
+        self.fc2 = nn.Linear(200, 100)
+        self.fc3 = nn.Linear(100, label_count)
 
     def forward(self, x):
         x = F.relu(self.embed1(x))
@@ -97,7 +97,7 @@ dataset = ATACDataset(file_path_training)
 train_set, test_set = torch.utils.data.random_split(dataset, [train_num, test_num])
 
 train_dataloader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
-test_dataloader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
+test_dataloader = DataLoader(test_set, batch_size=1, shuffle=True)
 
 ## DEBUG ##
 train_features, train_labels = next(iter(train_dataloader))
@@ -158,6 +158,10 @@ for epoch in range(epochs):
                     accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
 
             test_count = len(test_dataloader)
+
+            print(accuracy)
+            print(test_count)
+
             single_test_loss = test_loss / test_count
             single_test_accuracy = accuracy / test_count
             test_losses.append(single_test_loss)
