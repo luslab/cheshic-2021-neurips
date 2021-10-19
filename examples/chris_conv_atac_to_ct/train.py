@@ -49,6 +49,11 @@ class ATACDataset(Dataset):
         data = np.squeeze(data)
         return data, label
 
+class Model():
+    def __init__(self, ATAC_data, RNA_data, r_func):
+        self.y = r_func(RNA_data)
+    
+    
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
