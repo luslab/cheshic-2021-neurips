@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 ########### IMPORT LIBS ##########
 
 import logging
+import argparse
 import math
 
 import numpy as np
@@ -16,7 +20,10 @@ import torch.optim as optim
 
 ########### SETUP LIBS ##########
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 ########### VARIABLES ##########
 
@@ -49,11 +56,6 @@ class ATACDataset(Dataset):
         data = np.squeeze(data)
         return data, label
 
-class Model():
-    def __init__(self, ATAC_data, RNA_data, r_func):
-        self.y = r_func(RNA_data)
-    
-    
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -69,6 +71,13 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
+########### PARSE ARGUMENTS ##########
+parser = argparse.ArgumentParser()
+
+## REQUIRED PARAMETERS
+parser.add_argument('--training_data')
+args = parser.parse_args()
+
 ########### MAIN ##########
 
 # Log GPU status
@@ -78,16 +87,13 @@ if is_cuda:
     current_device = torch.cuda.current_device()
     #torch.cuda.device(current_device)
     device_count = torch.cuda.device_count()
-    logging.info("Cuda device count: " + device_count)
+    logging.info("Cuda device count: " + str(device_count))
     device_name = torch.cuda.get_device_name(current_device)
-    logging.info("Cuda device name: " + device_name)
+    logging.info("Cuda device name: " + str(device_name))
 
 logging.info('Initialising')
 
 logging.info('Setup')
-
-# Init file paths
-file_path_training = 'preprocessed.h5ad'
 
 # Init parameters
 test_num = math.floor(example_count * test_perc)
@@ -98,7 +104,7 @@ logging.info('Test examples: ' + str(test_num))
 
 # Load and split dataset
 logging.info('Loading and splitting dataset')
-dataset = ATACDataset(file_path_training)
+dataset = ATACDataset(args.training_data)
 train_set, test_set = torch.utils.data.random_split(dataset, [train_num, test_num])
 
 train_dataloader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
@@ -174,6 +180,5 @@ for epoch in range(epochs):
             model.train()
 
             logging.info('EVAL - [epoch-%d, %5d] test_loss: %.3f test_accuracy: %.3f' % (epoch + 1, i + 1, single_test_loss, single_test_accuracy * 100))
-
 
 logging.info('Finished Training')
