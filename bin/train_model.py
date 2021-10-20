@@ -20,7 +20,10 @@ import torch.optim as optim
 
 ########### SETUP LIBS ##########
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 ########### VARIABLES ##########
 
