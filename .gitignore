@@ -4,6 +4,7 @@ starter_kit/output/
 starter_kit/output.h5ad
 
 .nextflow*
+results/
 work/
 .DS_Store
 *.pyc

@@ -1,0 +1,12 @@
+name: packages
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.8.*
+  - pytorch::pytorch=1.9.*
+  - pytorch::torchvision=0.2.*
+  - pandas=1.3.*
+  - scanpy=1.8.*
+  - seaborn=0.11.*
