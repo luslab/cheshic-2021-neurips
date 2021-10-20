@@ -84,9 +84,9 @@ if is_cuda:
     current_device = torch.cuda.current_device()
     #torch.cuda.device(current_device)
     device_count = torch.cuda.device_count()
-    logging.info("Cuda device count: " + device_count)
+    logging.info("Cuda device count: " + str(device_count))
     device_name = torch.cuda.get_device_name(current_device)
-    logging.info("Cuda device name: " + device_name)
+    logging.info("Cuda device name: " + str(device_name))
 
 logging.info('Initialising')
 
