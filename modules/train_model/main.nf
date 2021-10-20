@@ -8,7 +8,7 @@ process TRAIN_MODEL {
         mode: params.publish_dir_mode,
         saveAs: { filename -> save_files(filename:filename, options:params.options, publish_dir:get_software_name(task.process), publish_id:'') }
 
-    container "luslab/neurips:latest"
+    container "luslab/neurips:nvidia"
     
     input:
     path training_data
