@@ -57,7 +57,7 @@ raw_config = dict(
     global_emb=False,
 
     comparator="dot",
-    dimension=100,
+    dimension=200,
     num_epochs=100,
     num_uniform_negs=50,
     loss_fn="softmax",

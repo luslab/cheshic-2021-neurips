@@ -38,7 +38,7 @@ learning_rate = 0.001
 momentum = 0.9
 epochs = 100
 loss_print_freq = 500
-eval_freq = 100
+eval_freq = 1000
 
 ########### CLASSES ##########
 
