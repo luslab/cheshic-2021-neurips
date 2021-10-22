@@ -65,27 +65,22 @@ raw_config = dict(
     eval_fraction=0.05,
 )
 
-########### PARSE ARGUMENTS ##########
-parser = argparse.ArgumentParser()
-
-## REQUIRED PARAMETERS
-parser.add_argument('--graph_path')
-# args = parser.parse_args()
-
 ########### MAIN ##########
 
 def train_graph():
-    logging.info('Initialising...')
+    parser = argparse.ArgumentParser()
 
-    # Log GPU status
-    is_cuda = torch.cuda.is_available()
-    logging.info("Cuda available: " + str(is_cuda))
-    if is_cuda:
-        current_device = torch.cuda.current_device()
-        device_count = torch.cuda.device_count()
-        logging.info("Cuda device count: " + str(device_count))
-        device_name = torch.cuda.get_device_name(current_device)
-        logging.info("Cuda device name: " + str(device_name))
+    parser.add_argument('--graph_path')
+    parser.add_argument('--model_dir')
+    parser.add_argument('--data_dir')
+    args = parser.parse_args()
+
+    DATA_DIR = args.data_dir
+    MODEL_DIR = args.model_dir
+    GRAPH_PATH = args.graph_path
+
+
+    logging.info('Initialising...')
 
     # Setup logging
     setup_logging()

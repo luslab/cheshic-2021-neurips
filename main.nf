@@ -2,12 +2,17 @@
 
 nextflow.enable.dsl = 2
 
-ch_training_data = file(params.training_data, checkIfExists: true)
+ch_training_data = file(params.training_data)
+ch_graph_data = file(params.training_data)
+ch_model_dir = file(params.training_data)
+ch_data_dir = file(params.training_data)
 
 def modules = params.modules.clone()
 
-include { TRAIN_MODEL } from "./modules/train_model/main" addParams( options: modules['train_model'])
+// include { TRAIN_MODEL } from "./modules/train_model/main" addParams( options: modules['train_model'])
+
+include { TRAIN_ATAC_GRAPH } from "./modules/train_atac_graph/main" addParams( options: modules['train_model'])
 
 workflow {
-    TRAIN_MODEL( ch_training_data )
+    TRAIN_ATAC_GRAPH( ch_graph_data, ch_data_dir, ch_model_dir )
 }
