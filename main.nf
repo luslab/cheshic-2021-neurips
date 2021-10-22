@@ -2,7 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-ch_training_data = file(params.training_data)
+//ch_training_data = file(params.training_data)
 ch_graph_data = file(params.training_data)
 ch_model_dir = file(params.training_data)
 ch_data_dir = file(params.training_data)
