@@ -21,7 +21,6 @@ file_path_training = '/Users/cheshic/dev/test_data/neurips-2021/multiome/multiom
 # Load data
 sc_raw_training = sc.read(file_path_training)
 
-
 # Convert to iterable format
 matrix = sc_raw_training.X.tocoo()
 logging.info("Data shape: " + str(matrix.shape))
@@ -35,7 +34,7 @@ count = 0
 logging.info('Writing edges...')
 for i,j,v in zip(matrix.row, matrix.col, matrix.data):
 
-    line = str(i) + "\tcell_peak\t" + str(j) + "\n"
+    line = "cell-" + str(i) + "\tcell_peak\tpeak-" + str(j) + "\n"
     writer.write(line)
 
     # count = count + 1
