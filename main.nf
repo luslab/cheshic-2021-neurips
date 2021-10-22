@@ -3,9 +3,9 @@
 nextflow.enable.dsl = 2
 
 //ch_training_data = file(params.training_data)
-ch_graph_data = file(params.training_data)
-ch_model_dir = file(params.training_data)
-ch_data_dir = file(params.training_data)
+ch_graph_data = file(params.graph_data)
+ch_model_dir = file(params.model_dir)
+ch_data_dir = file(params.data_dir)
 
 def modules = params.modules.clone()
 
