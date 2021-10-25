@@ -32,7 +32,7 @@ peak_count = 116490
 label_count = 21
 test_perc = 0.05
 
-input_dimensions = 100
+input_dimensions = 200
 batch_size = 20
 learning_rate = 0.001
 momentum = 0.9
@@ -67,18 +67,16 @@ class GraphDataset(Dataset):
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(input_dimensions, 200)
-        self.fc2 = nn.Linear(200, 1000)
-        self.fc3 = nn.Linear(1000, 500)
-        self.fc4 = nn.Linear(500, 200)
-        self.fc5 = nn.Linear(200, label_count)
+        self.fc1 = nn.Linear(input_dimensions, 1000)
+        self.fc2 = nn.Linear(1000, 1000)
+        self.fc3 = nn.Linear(1000, 200)
+        self.fc4 = nn.Linear(200, label_count)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
-        x = F.relu(self.fc4(x))
-        x = self.fc5(x)
+        x = self.fc4(x)
         return x
 
 ########### PARSE ARGUMENTS ##########
