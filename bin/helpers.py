@@ -27,17 +27,29 @@ class Load_Dataset(Dataset):
     
     It stores your data, performs your transformation and sets them up in an iterable way for pytorch.
     """
-    def __init__(self, ATAC_path, RNA_path, r_func):
-        # main peak vs cell matrix to be fed to transformer
+    def __init__(self, ATAC_path, RNA_path, r_func, use_cuda=True, float_size=32):
+        if float_size == 16:
+            self.dtype = torch.float16
+        elif float_size == 32:
+            self.dtype = torch.float32
+        elif float_size == 64:
+            self.dtype = torch.float64
+        if torch.cuda.is_available() and use_cuda:
+            self.device = torch.device('cuda:0')
+        else:
+            self.device = torch.device('cpu')
+        
+        
         self.dataset = sc.read(ATAC_path)
-        self.X = self.dataset.X.todense()
-        self.n_cells = self.X.shape[0]
-        self.n_peaks = self.X.shape[1]
+        self.X = torch.tensor(self.dataset.X.todense(), device=self.device, dtype=self.dtype)
+        self.n_cells = torch.tensor(self.X.shape[0], device=self.device, dtype=self.dtype)
+        self.n_peaks = torch.tensor(self.X.shape[1], device=self.device, dtype=self.dtype)
         
         # get ground truth
         self.RNA = sc.read(RNA_path)    
         self.Y = r_func(self.RNA)
-        self.n_labels = len(np.unique(self.Y))
+        self.Y = torch.tensor(self.Y, device=self.device, dtype=self.dtype)
+        self.n_labels = torch.tensor(len(np.unique(self.Y)), device=self.device, dtype=self.dtype)
         self.r_func = r_func
 
     def __len__(self):
